@@ -6,6 +6,8 @@ from .street import Street
 from typing import List
 from .observer import Observer
 from .subject import Subject
+from App.models.resident import Resident
+from App.controllers.notification import create_notification
 
 class Driver(User):
     __tablename__ = "driver"
@@ -135,3 +137,9 @@ class Driver(User):
         if drive:
             return drive.stops
         return None
+    
+    def notify_residents(self, message):
+        residents = Resident.query.filter_by(areaId=self.areaId, streetId=self.streetId).all()
+
+        for resident in residents:
+            create_notification(resident_id=resident.id, message=message, driver_id=self.id)

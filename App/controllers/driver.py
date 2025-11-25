@@ -63,8 +63,3 @@ def driver_update_stock(driver, item_id, quantity):
 def driver_view_stock(driver):
     stocks = DriverStock.query.filter_by(driverId=driver.id).all() 
     return stocks
-    
-    
-def notify_residents(self, residents, message):
-    for resident in residents:
-        create_notification(user_id=resident.id, message=message, driver_id=self.id)
