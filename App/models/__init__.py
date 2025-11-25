@@ -9,4 +9,3 @@ from .area import Area
 from .street import Street
 from .item import Item
 from .driver_stock import DriverStock
-from .notification import Notification

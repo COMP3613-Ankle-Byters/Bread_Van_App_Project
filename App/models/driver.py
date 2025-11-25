@@ -7,7 +7,8 @@ from typing import List
 from .observer import Observer
 from .subject import Subject
 
-class Driver(User):
+
+class Driver(User, Subject):
     __tablename__ = "driver"
 
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
