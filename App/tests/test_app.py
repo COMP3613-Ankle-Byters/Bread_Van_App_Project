@@ -60,19 +60,34 @@ class ResidentUnitTests(unittest.TestCase):
 
     def test_receive_notif(self):
         resident = Resident("john", "johnpass", 1, 2, 123)
-        resident.receive_notif("New msg")
-        assert resident.inbox[-1].endswith("New msg")
-        assert resident.inbox[-1].startswith("[")
+        driver = Driver("driv", "driverpass", "Busy", 2, 12)
+        db.session.add(resident)
+        db.session.add(driver)
+        db.session.commit()
+
+        resident.receive_notif("New msg", driver.id)
+
+        notif = resident.inbox[-1]
+
+        assert notif.message == "New msg"
+        assert notif.driver_id == driver.id
+        assert notif.resident_id == resident.id
 
     def test_view_inbox(self):
         resident = Resident("john", "johnpass", 1, 2, 123)
-        resident.receive_notif("msg1")
-        resident.receive_notif("msg2")
+        driver = Driver("sourname", "driverpass", "Busy", 2, 12)
+        db.session.add(resident)
+        db.session.add(driver)
+        db.session.commit()
+
+        resident.receive_notif("msg1", driver.id)
+        resident.receive_notif("msg2", driver.id)
+
         assert len(resident.inbox) == 2
-        assert resident.inbox[0].endswith("msg1")
-        assert resident.inbox[1].endswith("msg2")
-        assert resident.inbox[0].startswith("[")
-        assert resident.inbox[1].startswith("[")
+
+        assert resident.inbox[0].message == "msg1"
+        assert resident.inbox[1].message == "msg2"
+
         
 class DriverUnitTests(unittest.TestCase):
 
@@ -178,14 +193,30 @@ class DriverStockUnitTests(unittest.TestCase):
 
     def test_new_driverStock(self):
         driverStock = DriverStock(1, 2, 30)
-        assert driverStock.driverId == 1
-        assert driverStock.itemId == 2
-        assert driverStock.quantity == 30
+        self.assertDictEqual(
+            {
+                "stockId" : None,
+                "driverId" : 1,
+                "itemId" : 2,
+                "itemName" : None,
+                "quantity" : 30
+            },
+            driverStock.get_json()
+        )
 
     def test_driverStock_getJSON(self):
         driverStock = DriverStock(1, 2, 30)
         driverStock_json = driverStock.get_json()
-        self.assertDictEqual(driverStock_json, {"id":None, "driverId":1, "itemId":2, "quantity":30})
+        self.assertDictEqual(
+            {
+                "stockId" : None,
+                "driverId" : 1,
+                "itemId" : 2,
+                "itemName" : None,
+                "quantity" : 30
+            },
+            driverStock.get_json()
+        )
         
 
 '''
