@@ -113,6 +113,16 @@ class Driver(User):
             self.areaId = drive.areaId
             self.streetId = drive.streetId
             drive.status = "In Progress"
+            street = None
+            if self.streetId is not None:
+                street = Street.query.get(self.streetId)
+            self._observers = []
+            if street:
+                for resident in street.residents:
+                    self.attach(resident)
+                self.notify(
+                    f"DRIVE Started: Drive {drive.id} on {drive.date} at {drive.time}"
+                )
             db.session.commit()
             return drive
         return None
