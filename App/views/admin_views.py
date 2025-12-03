@@ -119,3 +119,40 @@ def list_streets():
     streets = admin_controller.admin_view_all_streets()
     items = [s.get_json() if hasattr(s, 'get_json') else s for s in (streets or [])]
     return jsonify({'items': items}), 200
+
+@admin_views.route('/admin/items', methods=['GET'])
+@jwt_required()
+@role_required('Admin')
+def list_items():
+    items = admin_controller.admin_view_all_items()
+    return jsonify({"items": [i.get_json() if hasattr(i, "get_json") else i.__dict__ for i in items]}), 200
+
+@admin_views.route('/admin/items', methods=['POST'])
+@jwt_required()
+@role_required('Admin')
+def add_item():
+    data = request.get_json() or {}
+    name = data.get("name")
+    price = data.get("price")
+    description = data.get("description")
+    tags = data.get("tags", "")
+
+    if not name or price is None:
+        return jsonify({"error": {"code": "validation_error", "message": "name and price required"}}), 422
+    
+    try:
+        item = admin_controller.admin_add_item(name, price, description, tags)
+    except Exception as e:
+        return jsonify({"error": {"code": "conflict", "message": str(e)}}), 409
+    
+    return jsonify(item.get_json() if hasattr(item, "get_json") else item.__dict__), 201
+
+@admin_views.route('/admin/items/<int:item_id>', methods=['DELETE'])
+@jwt_required()
+@role_required('Admin')
+def delete_item(item_id):
+    try:
+        admin_controller.admin_delete_item(item_id)
+    except ValueError as e:
+        return jsonify({"error": {"code": "resource_not_found", "message": str(e)}}), 404
+    return "", 204
