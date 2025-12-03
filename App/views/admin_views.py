@@ -77,56 +77,71 @@ def create_area():
 @jwt_required()
 @role_required('Admin')
 def delete_area(area_id):
-    admin_controller.admin_delete_area(area_id)
-    return '', 204
-
+    try:
+        admin_controller.admin_delete_area(area_id)
+        return jsonify({"message": f"Item {area_id} deleted successfully."}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
 
 @admin_views.route('/admin/streets', methods=['POST'])
 @jwt_required()
 @role_required('Admin')
 def create_street():
-    data = request.get_json() or {}
-    name = data.get('name')
-    area_id = data.get('area_id')
-    if not name or not area_id:
-        return jsonify({'error': {'code': 'validation_error', 'message': 'name and area_id required'}}), 422
-    street = admin_controller.admin_add_street(area_id, name)
-    out = street.get_json() if hasattr(street, 'get_json') else street
-    return jsonify(out), 201
+    try:
+        data = request.get_json() or {}
+        name = data.get('name')
+        area_id = data.get('area_id')
+        if not name or not area_id:
+            return jsonify({'error': {'code': 'validation_error', 'message': 'name and area_id required'}}), 422
+        street = admin_controller.admin_add_street(area_id, name)
+        out = street.get_json() if hasattr(street, 'get_json') else street
+        return jsonify(out), 201
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
 
 
 @admin_views.route('/admin/streets/<int:area_id>/<int:street_id>', methods=['DELETE'])
 @jwt_required()
 @role_required('Admin')
 def delete_street(area_id, street_id):
-    admin_controller.admin_delete_street(area_id, street_id)
-    return '', 204
-
+    try:
+        admin_controller.admin_delete_street(area_id, street_id)
+        return jsonify({"message": f"Item {street_id} deleted successfully."}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
 
 @admin_views.route('/admin/areas', methods=['GET'])
 @jwt_required()
 @role_required('Admin')
 def list_areas():
-    areas = admin_controller.admin_view_all_areas()
-    items = [a.get_json() if hasattr(a, 'get_json') else a for a in (areas or [])]
-    return jsonify({'items': items}), 200
-
+    try:
+        areas = admin_controller.admin_view_all_areas()
+        items = [a.get_json() if hasattr(a, 'get_json') else a for a in (areas or [])]
+        return jsonify({'items': items}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
 
 @admin_views.route('/admin/streets', methods=['GET'])
 @jwt_required()
 @role_required('Admin')
 def list_streets():
-    streets = admin_controller.admin_view_all_streets()
-    items = [s.get_json() if hasattr(s, 'get_json') else s for s in (streets or [])]
-    return jsonify({'items': items}), 200
+    try:
+        streets = admin_controller.admin_view_all_streets()
+        items = [s.get_json() if hasattr(s, 'get_json') else s for s in (streets or [])]
+        return jsonify({'items': items}), 200
+    except ValueError as e:
+            return jsonify({'error': str(e)}), 400
 
 @admin_views.route('/admin/items', methods=['GET'])
 @jwt_required()
 @role_required('Admin')
 def list_items():
-    items = admin_controller.admin_view_all_items()
-    return jsonify({"items": [i.get_json() if hasattr(i, "get_json") else i.__dict__ for i in items]}), 200
-
+    try:
+        items = admin_controller.admin_view_all_items()
+        return jsonify({"items": [i.get_json() if hasattr(i, "get_json") else i.__dict__ for i in items]}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    
 @admin_views.route('/admin/items', methods=['POST'])
 @jwt_required()
 @role_required('Admin')
@@ -142,8 +157,8 @@ def add_item():
     
     try:
         item = admin_controller.admin_add_item(name, price, description, tags)
-    except Exception as e:
-        return jsonify({"error": {"code": "conflict", "message": str(e)}}), 409
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     
     return jsonify(item.get_json() if hasattr(item, "get_json") else item.__dict__), 201
 
@@ -151,8 +166,15 @@ def add_item():
 @jwt_required()
 @role_required('Admin')
 def delete_item(item_id):
+    data = request.get_json() or {}
+    item_id = data.get("item_id")
+    if not item_id:
+        return jsonify({
+            "error": {"code": "validation_error", "message": "item_id required"}
+        }), 422
+    
     try:
         admin_controller.admin_delete_item(item_id)
+        return jsonify({"message": f"Item {item_id} deleted successfully."}), 200
     except ValueError as e:
-        return jsonify({"error": {"code": "resource_not_found", "message": str(e)}}), 404
-    return "", 204
+        return jsonify({"error": {"code": "resource_not_found", "message": str(e) }}), 404
