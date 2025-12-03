@@ -59,50 +59,6 @@ def create_resident():
     out = resident.get_json() if hasattr(resident, 'get_json') else {'id': resident.id}
     return jsonify(out), 201
 
-
-@admin_views.route('/admin/areas', methods=['POST'])
-@jwt_required()
-@role_required('Admin')
-def create_area():
-    data = request.get_json() or {}
-    name = data.get('name')
-    if not name:
-        return jsonify({'error': {'code': 'validation_error', 'message': 'name required'}}), 422
-    area = admin_controller.admin_add_area(name)
-    out = area.get_json() if hasattr(area, 'get_json') else area
-    return jsonify(out), 201
-
-
-@admin_views.route('/admin/areas/<int:area_id>', methods=['DELETE'])
-@jwt_required()
-@role_required('Admin')
-def delete_area(area_id):
-    admin_controller.admin_delete_area(area_id)
-    return '', 204
-
-
-@admin_views.route('/admin/streets', methods=['POST'])
-@jwt_required()
-@role_required('Admin')
-def create_street():
-    data = request.get_json() or {}
-    name = data.get('name')
-    area_id = data.get('area_id')
-    if not name or not area_id:
-        return jsonify({'error': {'code': 'validation_error', 'message': 'name and area_id required'}}), 422
-    street = admin_controller.admin_add_street(area_id, name)
-    out = street.get_json() if hasattr(street, 'get_json') else street
-    return jsonify(out), 201
-
-
-@admin_views.route('/admin/streets/<int:area_id>/<int:street_id>', methods=['DELETE'])
-@jwt_required()
-@role_required('Admin')
-def delete_street(area_id, street_id):
-    admin_controller.admin_delete_street(area_id, street_id)
-    return '', 204
-
-
 @admin_views.route('/admin/areas', methods=['GET'])
 @jwt_required()
 @role_required('Admin')
@@ -119,3 +75,50 @@ def list_streets():
     streets = admin_controller.admin_view_all_streets()
     items = [s.get_json() if hasattr(s, 'get_json') else s for s in (streets or [])]
     return jsonify({'items': items}), 200
+
+@admin_views.route('/admin/items', methods=['GET'])
+@jwt_required()
+@role_required('Admin')
+def list_items():
+    try:
+        items = admin_controller.admin_view_all_items()
+        return jsonify({"items": [i.get_json() if hasattr(i, "get_json") else i.__dict__ for i in items]}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
+@admin_views.route('/admin/items', methods=['POST'])
+@jwt_required()
+@role_required('Admin')
+def add_item():
+    data = request.get_json() or {}
+    name = data.get("name")
+    price = data.get("price")
+    description = data.get("description")
+    tags = data.get("tags", "")
+
+    if not name or price is None:
+        return jsonify({"error": {"code": "validation_error", "message": "name and price required"}}), 422
+
+    try:
+        item = admin_controller.admin_add_item(name, price, description, tags)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
+    return jsonify(item.get_json() if hasattr(item, "get_json") else item.__dict__), 201
+
+@admin_views.route('/admin/items/<int:item_id>', methods=['DELETE'])
+@jwt_required()
+@role_required('Admin')
+def delete_item(item_id):
+    data = request.get_json() or {}
+    item_id = data.get("item_id")
+    if not item_id:
+        return jsonify({
+            "error": {"code": "validation_error", "message": "item_id required"}
+        }), 422
+
+    try:
+        admin_controller.admin_delete_item(item_id)
+        return jsonify({"message": f"Item {item_id} deleted successfully."}), 200
+    except ValueError as e:
+        return jsonify({"error": {"code": "resource_not_found", "message": str(e) }}), 404
