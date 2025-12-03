@@ -12,9 +12,11 @@ resident_views = Blueprint('resident_views', __name__)
 @jwt_required()
 @role_required('Resident')
 def me():
-    uid = current_user_id()
-    return jsonify({'id': uid}), 200
-
+    try:    
+        uid = current_user_id()
+        return jsonify({'id': uid}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
 
 @resident_views.route('/resident/stops', methods=['POST'])
 @jwt_required()
@@ -73,16 +75,19 @@ def inbox():
 @jwt_required()
 @role_required('Resident')
 def driver_stats():
-    data = request.get_json() or {}
-    driver_id = data.get('driver_id')
-    if not driver_id:
-        return jsonify({'error': {'code': 'validation_error', 'message': 'driver_id is required'}}), 422
-
-    uid = current_user_id()
-    resident = user_controller.get_user(uid)
     try:
-        stats = resident_controller.resident_view_driver_stats(resident, int(driver_id))
-    except ValueError as e:
-        return jsonify({'error': {'code': 'not_found', 'message': str(e)}}), 404
+        data = request.get_json() or {}
+        driver_id = data.get('driver_id')
+        if not driver_id:
+            return jsonify({'error': {'code': 'validation_error', 'message': 'driver_id is required'}}), 422
 
-    return jsonify({'stats': stats}), 200
+        uid = current_user_id()
+        resident = user_controller.get_user(uid)
+        try:
+            stats = resident_controller.resident_view_driver_stats(resident, int(driver_id))
+        except ValueError as e:
+            return jsonify({'error': {'code': 'not_found', 'message': str(e)}}), 404
+
+        return jsonify({'stats': stats}), 200
+    except ValueError as e:
+            return jsonify({'error': str(e)}), 400
