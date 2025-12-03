@@ -59,5 +59,6 @@ __all__ = [
 
     # admin
     "admin_create_driver", "admin_delete_driver", "admin_add_item",
-    "admin_delete_item", "admin_view_all_items"
+    "admin_delete_item", "admin_view_all_items", "admin_view_all_areas",
+    "admin_view_all_streets"
 ]
