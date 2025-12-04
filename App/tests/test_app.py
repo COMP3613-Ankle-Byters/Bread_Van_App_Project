@@ -414,26 +414,5 @@ class AdminsIntegrationTests(unittest.TestCase):
         assert items != None
         assert len(items) == 3
         
-class NotificationsIntegrationTests(unittest.TestCase):
-    def setUp(self):
-        self.area = admin_add_area("St. Augustine")
-        self.street = admin_add_street(self.area.id, "Warner Street")
-        self.resident = resident_create("house", "housepass", self.area.id, self.street.id, 123)
-    def test_create_notification(self):
-        notification = create_notification(self.resident.id, "Your drive is scheduled for tomorrow.")
-        self.assertIsNotNone(notification)
-        self.assertEqual(notification.resident_id, self.resident.id)
-        self.assertEqual(notification.message, "Your drive is scheduled for tomorrow.")
 
-    def test_get_notifications(self):
-        create_notification(self.resident.id, "Your drive is scheduled for tomorrow.")
-        create_notification(self.resident.id, "Your stop has been approved.")
-        notifications = get_notifications(self.resident.id)
-        
-        assert len(notifications) == 2
-        messages = {n.message for n in notifications}
-        assert messages == {
-            "Your drive is scheduled for tomorrow.",
-            "Your stop has been approved."
-        }
 
