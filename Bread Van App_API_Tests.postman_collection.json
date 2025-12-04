@@ -1,108 +1,3347 @@
 {
 	"info": {
-		"_postman_id": "9a5102a2-3dec-4234-9d40-c3c91afa88dc",
-		"name": "Bread Van App_API_Tests",
+		"_postman_id": "53c3710c-c549-4e9e-a1d3-3885e5def666",
+		"name": "Ankle Byters Test Suite",
+		"description": "Suite contained admin, resident and driver api commands",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "42959560"
+		"_exporter_id": "42596510",
+		"_collection_link": "https://asda99-1897.postman.co/workspace/SWENG2~545b9f0b-d923-4ede-b704-ce42de14d2ba/collection/42596510-53c3710c-c549-4e9e-a1d3-3885e5def666?action=share&source=collection_link&creator=42596510"
 	},
 	"item": [
 		{
-			"name": "Show All Admin Users",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
+			"name": "Admin Api",
+			"item": [
+				{
+					"name": "Login as Admin",
+					"event": [
 						{
-							"key": "token",
-							"value": "{{$randomUUID}}",
-							"type": "string"
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"let json;",
+									"try {",
+									"  json = pm.response.json();",
+									"} catch (e) {",
+									"  json = {};",
+									"}",
+									"",
+									"pm.test(\"Login Sucessful, Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has access token\", function () {",
+									"  pm.expect(json).to.have.property(\"access_token\");",
+									"  pm.expect(json.access_token).to.be.a(\"string\");",
+									"  pm.environment.set(\"access_token\", json.access_token);",
+									"});",
+									"",
+									"const user = (json && (json.user || (json.data && json.data.user) || (json.profile && json.profile.user))) || null;",
+									"",
+									"pm.test(\"User is an Admin\", function () {",
+									"  if (user && typeof user.role !== 'undefined') {",
+									"    pm.expect(user.role, \"Expected user.role to equal 'Admin'\").to.eql(\"Admin\");",
+									"    pm.environment.set(\"user_role\", user.role);",
+									"  } ",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"admin\", \r\n    \"password\" : \"adminpass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Log in and get auth token"
+					},
+					"response": [
+						{
+							"name": "Login as Admin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\" : \"admin\", \r\n    \"password\" : \"adminpass\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/login",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:01:41 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "309"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NDc5OTMwMSwianRpIjoiYWJkMjY5M2MtNzMwYi00MmZiLWIzMmUtOTliODUwNWJjZDMyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjQ3OTkzMDEsImV4cCI6MTc2NDgwMDIwMSwicm9sZSI6IkFkbWluIn0.NT1ZjjbMrNqJceq78BeZ5f5b-wxJU25W2LjGIWVKoD8\"\n}"
 						}
 					]
 				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"sally:\",\r\n  \"password\": \"sallypass:\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/admin/users?",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"admin",
-						"users"
-					],
-					"query": [
+				{
+					"name": "(Admin) Identify",
+					"event": [
 						{
-							"key": "",
-							"value": null
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let json = {};\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.expect(() => { json = pm.response.json(); }).to.not.throw();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains 'message' field\", function () {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.be.a(\"string\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message contains username and id\", function () {\r",
+									"    pm.expect(json.message).to.include(\"username\");\r",
+									"    pm.expect(json.message).to.include(\"id\");\r",
+									"});\r",
+									"\r",
+									"let match = json.message.match(/username:\\s*(.*),\\s*id\\s*:\\s*(\\d+)/);\r",
+									"\r",
+									"if (match) {\r",
+									"    pm.environment.set(\"identified_username\", match[1]);\r",
+									"    pm.environment.set(\"identified_user_id\", match[2]);\r",
+									"\r",
+									"    pm.test(\"Extracted username and id successfully\", function () {\r",
+									"        pm.expect(match[1]).to.be.a(\"string\");\r",
+									"        pm.expect(Number(match[2])).to.be.a(\"number\");\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Message format is valid\", function () {\r",
+									"        pm.expect.fail(\"Message did not match expected format: \" + json.message);\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/identify",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"identify"
+							]
+						},
+						"description": "Identify who is logged in. In this instance it is to identify the admin"
+					},
+					"response": [
+						{
+							"name": "(Admin) Identify",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/identify",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"identify"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:03:21 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "43"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"username: admin, id : 1\"\n}"
+						}
+					]
+				},
+				{
+					"name": "(Admin) View All Items",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Items array exists\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"items\");\r",
+									"    pm.expect(json.items).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each item contains required fields\", function () {\r",
+									"    const items = pm.response.json().items;\r",
+									"\r",
+									"    items.forEach(item => {\r",
+									"        pm.expect(item).to.have.property(\"name\");\r",
+									"        pm.expect(item).to.have.property(\"price\");\r",
+									"        pm.expect(item).to.have.property(\"description\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Not allowed for non-admin role\", function () {\r",
+									"    if (pm.response.code === 403) {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json.error.code).to.eql(\"forbidden\");\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/admin/items",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"items"
+							]
+						},
+						"description": "Displays all menu items registered on the system"
+					},
+					"response": [
+						{
+							"name": "(Admin) View All Items",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/admin/items",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"admin",
+										"items"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:34:28 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1495"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"items\": [\n        {\n            \"description\": \"Freshly baked bread loaf.\",\n            \"id\": 1,\n            \"name\": \"Bread Loaf\",\n            \"price\": 12.5,\n            \"tags\": [\n                \"bread\"\n            ]\n        },\n        {\n            \"description\": \"Buttery croissant.\",\n            \"id\": 2,\n            \"name\": \"Croissant\",\n            \"price\": 8,\n            \"tags\": [\n                \"pastry\"\n            ]\n        },\n        {\n            \"description\": \"Blueberry muffin.\",\n            \"id\": 3,\n            \"name\": \"Muffin\",\n            \"price\": 6,\n            \"tags\": [\n                \"pastry\"\n            ]\n        },\n        {\n            \"description\": \"Crispy French baguette.\",\n            \"id\": 4,\n            \"name\": \"Baguette\",\n            \"price\": 10,\n            \"tags\": [\n                \"bread\"\n            ]\n        },\n        {\n            \"description\": \"Glazed donut.\",\n            \"id\": 5,\n            \"name\": \"Donut\",\n            \"price\": 7,\n            \"tags\": [\n                \"sweet\",\n                \"pastry\"\n            ]\n        },\n        {\n            \"description\": \"Fresh bagel.\",\n            \"id\": 6,\n            \"name\": \"Bagel\",\n            \"price\": 5,\n            \"tags\": [\n                \"bread\"\n            ]\n        },\n        {\n            \"description\": \"Tangy sourdough bread.\",\n            \"id\": 7,\n            \"name\": \"Sourdough Bread\",\n            \"price\": 15,\n            \"tags\": [\n                \"bread\"\n            ]\n        },\n        {\n            \"description\": \"Sweet cinnamon roll.\",\n            \"id\": 8,\n            \"name\": \"Cinnamon Roll\",\n            \"price\": 6,\n            \"tags\": [\n                \"sweet\",\n                \"pastry\"\n            ]\n        },\n        {\n            \"description\": \"Cream cheese danish.\",\n            \"id\": 9,\n            \"name\": \"Cheese Danish\",\n            \"price\": 5,\n            \"tags\": [\n                \"pastry\"\n            ]\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "(Admin) Add Item",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Response contains item fields\", function () {\r",
+									"    pm.expect(json).to.be.an(\"object\");\r",
+									"    pm.expect(json).to.have.property(\"id\");\r",
+									"    pm.expect(json).to.have.property(\"name\");\r",
+									"    pm.expect(json).to.have.property(\"price\");\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"item_id\", json.id);\r",
+									"\r",
+									"pm.test(\"No error returned\", function () {\r",
+									"    pm.expect(json).to.not.have.property(\"error\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Bread\",\r\n    \"price\" : \"10\",\r\n    \"description\": \"food\",\r\n    \"tags\" : \"white\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/admin/items",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"items"
+							]
+						},
+						"description": "Adds a menu item to the system"
+					},
+					"response": [
+						{
+							"name": "(Admin) Add Item",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\" : \"Bread\",\r\n    \"price\" : \"10\",\r\n    \"description\": \"food\",\r\n    \"tags\" : \"white\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/admin/items",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"admin",
+										"items"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:34:36 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "95"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"description\": \"food\",\n    \"id\": 10,\n    \"name\": \"Bread\",\n    \"price\": 10,\n    \"tags\": \"white\"\n}"
+						}
+					]
+				},
+				{
+					"name": "(Admin) Delete Item",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Valid JSON response\", function () {\r",
+									"    pm.expect(() => pm.response.json()).to.not.throw();\r",
+									"});\r",
+									"\r",
+									"let json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Contains deletion success message\", function () {\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.include(\"deleted successfully\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Deleting same item again should return 404\", function () {\r",
+									"    if (pm.environment.get(\"repeat_check\") !== \"false\") {\r",
+									"        pm.sendRequest({\r",
+									"            url: pm.environment.get(\"host\") + \"/admin/items/\" + pm.environment.get(\"item_id\"),\r",
+									"            method: 'DELETE',\r",
+									"            header: {\r",
+									"                'Authorization': 'Bearer ' + pm.environment.get(\"auth_token\")\r",
+									"            }\r",
+									"        }, function (error, response) {\r",
+									"            pm.expect(response.code).to.eql(404);\r",
+									"        });\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"item_id\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/admin/items/{{item_id}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"items",
+								"{{item_id}}"
+							]
+						},
+						"description": "Deletes a menu item from the system"
+					},
+					"response": [
+						{
+							"name": "(Admin) Delete Item",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"item_id\": 10\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/admin/items/{{item_id}}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"admin",
+										"items",
+										"{{item_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:34:45 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "49"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Item 10 deleted successfully.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "(Admin) Create Driver",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Create Driver - Status 201 Created\", () => pm.response.to.have.status(201));\r",
+									"\r",
+									"pm.test(\"Create Driver - Response has driver ID\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property('id').that.is.a('number').above(0);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"Gerry\",\r\n    \"password\" : \"driverpass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/admin/drivers",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"drivers"
+							]
+						},
+						"description": "Creates a driver and adds them to database"
+					},
+					"response": [
+						{
+							"name": "(Admin) Create Driver",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\" : \"Gerry\",\r\n    \"password\" : \"driverpass\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/admin/drivers",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"admin",
+										"drivers"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:34:57 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "95"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"areaId\": 0,\n    \"id\": 7,\n    \"status\": \"Offline\",\n    \"streetId\": null,\n    \"username\": \"Gerry\"\n}"
+						}
+					]
+				},
+				{
+					"name": "(Admin) Delete Driver",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Delete Driver - Status 204 No Content\", () => pm.response.to.have.status(204));\r",
+									"\r",
+									"pm.test(\"Delete Driver - Response body is empty\", function () {\r",
+									"    pm.expect(pm.response.text()).to.eql(\"\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/admin/drivers/7",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"drivers",
+								"7"
+							]
+						},
+						"description": "Deletes a specified driver from the database"
+					},
+					"response": [
+						{
+							"name": "(Admin) Delete Driver",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/admin/drivers/7",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"admin",
+										"drivers",
+										"7"
+									]
+								}
+							},
+							"status": "NO CONTENT",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:35:13 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=utf-8"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "(Admin) View all Areas",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"View all Areas - Status 200\", () => pm.response.to.have.status(200));",
+									"",
+									"pm.test(\"View all Areas - Items is an array\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json, \"Response body should be a non-null object\").to.be.an(\"object\");",
+									"    pm.expect(json.items, \"Response should contain 'items' array\").to.be.an(\"array\");",
+									"});",
+									"",
+									"pm.test(\"View all Areas - Each item has required fields (id:number, name:string)\", function () {",
+									"    const { items } = pm.response.json();",
+									"    pm.expect(items, \"'items' must be an array to iterate\").to.be.an(\"array\");",
+									"",
+									"    items.forEach((area, idx) => {",
+									"        pm.expect(area, `items[${idx}] should be an object`).to.be.an(\"object\");",
+									"        pm.expect(area, `items[${idx}] should have numeric id`).to.have.property(\"id\");",
+									"        pm.expect(typeof area.id, `items[${idx}].id should be a number`).to.eql(\"number\");",
+									"        pm.expect(area, `items[${idx}] should have string name`).to.have.property(\"name\");",
+									"        pm.expect(typeof area.name, `items[${idx}].name should be a string`).to.eql(\"string\");",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/admin/areas",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"areas"
+							]
+						},
+						"description": "Displays all area objects"
+					},
+					"response": [
+						{
+							"name": "(Admin) View all Areas",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/admin/areas",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"admin",
+										"areas"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:35:23 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "184"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"items\": [\n        {\n            \"id\": 1,\n            \"name\": \"St. Augustine\"\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Tunapuna\"\n        },\n        {\n            \"id\": 3,\n            \"name\": \"San Juan\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "(Admin) View all Streets",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"View all Streets - Status 200\", () => pm.response.to.have.status(200));",
+									"",
+									"let json;",
+									"pm.test(\"Response body is valid JSON\", function () {",
+									"    try {",
+									"        json = pm.response.json();",
+									"        pm.expect(json).to.be.an(\"object\");",
+									"    } catch (e) {",
+									"        throw new Error(\"Response is not valid JSON\");",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"View all Streets - items is an array\", function () {",
+									"    pm.expect(json).to.have.property(\"items\");",
+									"    pm.expect(json.items).to.be.an(\"array\");",
+									"});",
+									"",
+									"pm.test(\"Each street has correct types when present\", function () {",
+									"    (json.items || []).forEach(street => {",
+									"        if (Object.prototype.hasOwnProperty.call(street, \"id\")) {",
+									"            pm.expect(street.id, \"id should be a number when present\").to.be.a(\"number\");",
+									"        }",
+									"        if (Object.prototype.hasOwnProperty.call(street, \"areaId\")) {",
+									"            pm.expect(street.areaId, \"areaId should be a number when present\").to.be.a(\"number\");",
+									"        }",
+									"        if (Object.prototype.hasOwnProperty.call(street, \"name\")) {",
+									"            pm.expect(street.name, \"name should be a string when present\").to.be.a(\"string\");",
+									"        }",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/admin/streets",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"admin",
+								"streets"
+							]
+						},
+						"description": "Displays all street objects"
+					},
+					"response": [
+						{
+							"name": "(Admin) View all Streets",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/admin/streets",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"admin",
+										"streets"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:35:31 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "406"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"items\": [\n        {\n            \"areaId\": 1,\n            \"id\": 1,\n            \"name\": \"Gordon Street\"\n        },\n        {\n            \"areaId\": 1,\n            \"id\": 2,\n            \"name\": \"Warner Street\"\n        },\n        {\n            \"areaId\": 1,\n            \"id\": 3,\n            \"name\": \"College Road\"\n        },\n        {\n            \"areaId\": 2,\n            \"id\": 4,\n            \"name\": \"Fairly Street\"\n        },\n        {\n            \"areaId\": 2,\n            \"id\": 5,\n            \"name\": \"Saint John Road\"\n        }\n    ]\n}"
 						}
 					]
 				}
-			},
-			"response": []
+			],
+			"description": "Admin API commands"
 		},
 		{
-			"name": "Create Driver",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{host}}/admin/drivers",
-					"host": [
-						"{{host}}"
+			"name": "Resident Api",
+			"item": [
+				{
+					"name": "Resident Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains access_token\", function () {\r",
+									"    let json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"access_token\");\r",
+									"    pm.environment.set(\"auth_token\", json.access_token);\r",
+									"});\r",
+									"if (!pm.environment.get(\"auth_token\")) {\r",
+									"    pm.expect.fail(\"No auth_token found. Run login first.\");\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
 					],
-					"path": [
-						"admin",
-						"drivers"
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"alice\",\r\n  \"password\": \"alicepass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Resident Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"alice\",\r\n  \"password\": \"alicepass\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/login",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:35:44 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "313"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NDgwMTM0NCwianRpIjoiZjM2ZDM1NTgtZGM2Yi00Y2UxLWE5MzEtNmJlZTFlZDU1YzNhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjQiLCJuYmYiOjE3NjQ4MDEzNDQsImV4cCI6MTc2NDgwMjI0NCwicm9sZSI6IlJlc2lkZW50In0.J-S_idUEgLAt2_E-UAYkaWPGYTz_5Cmqae1zBNjH2yc\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Resident Signup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 (Created)\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    try {\r",
+									"        pm.response.json();\r",
+									"    } catch (e) {\r",
+									"        pm.expect.fail(\"Response is not valid JSON\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"let json;\r",
+									"try {\r",
+									"    json = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    json = {};\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Response has id\", function () {\r",
+									"    pm.expect(json).to.be.an(\"object\");\r",
+									"    pm.expect(json).to.have.property(\"id\");\r",
+									"    pm.expect(json.id).to.be.a(\"number\");\r",
+									"});\r",
+									"\r",
+									"if (json.id !== undefined) {\r",
+									"    pm.environment.set(\"new_user_id\", json.id);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.code >= 400) {\r",
+									"    pm.test(\"Error response contains 'error' object\", function () {\r",
+									"        pm.expect(json).to.have.property(\"error\");\r",
+									"        pm.expect(json.error).to.have.property(\"code\");\r",
+									"        pm.expect(json.error).to.have.property(\"message\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"joe\",\r\n  \"password\": \"joepass\",\r\n  \"area_id\": 1,\r\n  \"street_id\": 1,\r\n  \"house_number\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/signup",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"signup"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Resident Signup",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"joe\",\r\n  \"password\": \"joepass\",\r\n  \"area_id\": 1,\r\n  \"street_id\": 1,\r\n  \"house_number\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/signup",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"signup"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:36:04 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "102"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"areaId\": 1,\n    \"houseNumber\": 1,\n    \"id\": 8,\n    \"inbox\": [],\n    \"streetId\": 1,\n    \"username\": \"joe\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Resident Me",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"GET /driver/me - Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"GET /driver/me - Has Resident ID\", function() {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData.id).to.be.a('number');\r",
+									"    \r",
+									"    pm.environment.set(\"driver_id\", jsonData.id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/resident/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"resident",
+								"me"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Resident Me",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/resident/me",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"resident",
+										"me"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:36:12 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "14"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 4\n}"
+						}
+					]
+				},
+				{
+					"name": "Request Stop",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Ensure the response status code is correct\r",
+									"pm.test(\"Status code is 201 (Created) or 422/400 for errors\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([201, 400, 422]);\r",
+									"});\r",
+									"\r",
+									"// Ensure the response is valid JSON\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    try {\r",
+									"        pm.response.json();\r",
+									"    } catch (e) {\r",
+									"        pm.expect.fail(\"Response is not valid JSON\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"// Parse JSON response safely\r",
+									"let json;\r",
+									"try {\r",
+									"    json = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    json = {};\r",
+									"}\r",
+									"\r",
+									"// Check response when successful (201)\r",
+									"if (pm.response.code === 201) {\r",
+									"    pm.test(\"Response contains stop ID\", function () {\r",
+									"        pm.expect(json).to.be.an(\"object\");\r",
+									"        pm.expect(json).to.have.property(\"id\");\r",
+									"        pm.expect(json.id).to.be.a(\"number\");\r",
+									"    });\r",
+									"\r",
+									"    // Save stop_id to environment for use in other requests\r",
+									"    if (json.id !== undefined) {\r",
+									"        pm.environment.set(\"stop_id\", json.id);\r",
+									"    }\r",
+									"}\r",
+									"\r",
+									"// Check response when validation or logical error occurs\r",
+									"if (pm.response.code === 422 || pm.response.code === 400) {\r",
+									"    pm.test(\"Response contains error object\", function () {\r",
+									"        pm.expect(json).to.have.property(\"error\");\r",
+									"        pm.expect(json.error).to.have.property(\"code\");\r",
+									"        pm.expect(json.error).to.have.property(\"message\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"drive_id\": 1\r\n}"
+						},
+						"url": {
+							"raw": "{{host}}/resident/stops",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"resident",
+								"stops"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Request Stop",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"drive_id\": 1\r\n}"
+								},
+								"url": {
+									"raw": "{{host}}/resident/stops",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"resident",
+										"stops"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:36:21 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "49"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"driveId\": 1,\n    \"id\": 2,\n    \"residentId\": 4\n}"
+						}
+					]
+				},
+				{
+					"name": "Cancel Stop",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response has message\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"message\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message mentions drive_id\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.include(\"drive 1\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"drive_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/resident/stops",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"resident",
+								"stops"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Cancel Stop",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"drive_id\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/resident/stops",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"resident",
+										"stops"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:36:30 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Stop for drive 1 deleted successfully.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "View Driver Stats",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseJson;\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    try {\r",
+									"        responseJson = pm.response.json();\r",
+									"        pm.expect(responseJson).to.be.an(\"object\");\r",
+									"    } catch (e) {\r",
+									"        pm.expect.fail(\"Response is not valid JSON.\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"If success → should return stats and 200 status\", function () {\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.expect(responseJson).to.have.property(\"stats\");\r",
+									"        pm.expect(responseJson.stats).to.be.an(\"object\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"If missing driver_id → should return validation_error\", function () {\r",
+									"    if (pm.response.code === 422) {\r",
+									"        pm.expect(responseJson).to.have.property(\"error\");\r",
+									"        pm.expect(responseJson.error.code).to.eql(\"validation_error\");\r",
+									"        pm.expect(responseJson.error.message).to.eql(\"driver_id is required\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"If driver does not exist → error not_found\", function () {\r",
+									"    if (pm.response.code === 404) {\r",
+									"        pm.expect(responseJson).to.have.property(\"error\");\r",
+									"        pm.expect(responseJson.error.code).to.eql(\"not_found\");\r",
+									"        pm.expect(responseJson.error.message).to.be.a(\"string\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"driver_id\": 2\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/resident/driver-stats",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"resident",
+								"driver-stats"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "View Driver Stats",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"driver_id\": 2\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/resident/driver-stats",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"resident",
+										"driver-stats"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:36:44 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "414"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"stats\": {\n        \"areaId\": 1,\n        \"id\": 2,\n        \"status\": \"Offline\",\n        \"stock\": [\n            {\n                \"driverId\": 2,\n                \"itemId\": 1,\n                \"itemName\": \"Bread Loaf\",\n                \"quantity\": 20,\n                \"stockId\": 1\n            },\n            {\n                \"driverId\": 2,\n                \"itemId\": 3,\n                \"itemName\": \"Muffin\",\n                \"quantity\": 10,\n                \"stockId\": 2\n            }\n        ],\n        \"streetId\": 1,\n        \"username\": \"bob\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "View Inbox",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains items array\", function () {\r",
+									"    let json;\r",
+									"    try {\r",
+									"        json = pm.response.json();\r",
+									"    } catch (e) {\r",
+									"        pm.expect.fail(\"Response is not valid JSON\");\r",
+									"    }\r",
+									"    pm.expect(json).to.have.property(\"items\");\r",
+									"    pm.expect(json.items).to.be.an(\"array\");\r",
+									"    \r",
+									"    if (json.items.length > 0) {\r",
+									"        pm.environment.set(\"notif_id\", json.items[0].id);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/resident/inbox",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"resident",
+								"inbox"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "View Inbox",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{host}}/resident/inbox",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"resident",
+										"inbox"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:37:01 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "438"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"items\": [\n        {\n            \"date\": \"Wed, 03 Dec 2025 18:01:33 GMT\",\n            \"driver_id\": 3,\n            \"id\": 1,\n            \"message\": \"A route is scheduled for your neighborhood. DriveID = 1 \\nETA: 11:00 AM\\n\\nAvailable Items:\\n- Bread Loaf: $12.50\\n- Croissant: $8.00\\n- Muffin: $6.00\\n- Baguette: $10.00\\n- Donut: $7.00\\n- Bagel: $5.00\\n- Sourdough Bread: $15.00\\n- Cinnamon Roll: $6.00\\n- Cheese Danish: $5.00\",\n            \"resident_id\": 4\n        }\n    ]\n}"
+						}
 					]
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Delete Driver",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{host}}//admin/drivers/<int:driver_id>",
-					"host": [
-						"{{host}}"
+			"name": "Driver Api",
+			"item": [
+				{
+					"name": "Driver Login",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains access_token\", function () {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"access_token\");",
+									"    pm.environment.set(\"auth_token\", json.access_token);",
+									"});",
+									"if (!pm.environment.get(\"auth_token\")) {",
+									"    pm.expect.fail(\"No auth_token found. Run login first.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
 					],
-					"path": [
-						"",
-						"admin",
-						"drivers",
-						"<int:driver_id>"
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"bob\",\r\n  \"password\": \"bobpass\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Driver Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"bob\",\r\n  \"password\": \"bobpass\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/login",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:38:38 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "310"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2NDgwMTUxOCwianRpIjoiOTg1ZjJkMjctNzQ2MS00OTYzLTgwN2QtMjhmNmRhZTQwNDk4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NjQ4MDE1MTgsImV4cCI6MTc2NDgwMjQxOCwicm9sZSI6IkRyaXZlciJ9.ub3r1PtmIM8UKNkqA2EQysQlik4OXHGxqgjUeSsjZFA\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Driver Me",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"GET /driver/me - Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"GET /driver/me - Has driver ID\", function() {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData.id).to.be.a('number');\r",
+									"    \r",
+									"    pm.environment.set(\"driver_id\", jsonData.id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/driver/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"driver",
+								"me"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Driver Me",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/driver/me",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"driver",
+										"me"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:38:50 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "14"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 2\n}"
+						}
+					]
+				},
+				{
+					"name": "Requested Stops",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is valid JSON\", function () {",
+									"  pm.expect(() => pm.response.json()).to.not.throw();",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"pm.test(\"Top-level object contains items array\", function () {",
+									"  pm.expect(json).to.have.property(\"items\");",
+									"  pm.expect(json.items).to.be.an(\"array\");",
+									"});",
+									"",
+									"pm.test(\"Each stop has expected fields\", function () {",
+									"  json.items.forEach((stop, idx) => {",
+									"    pm.expect(stop, `item[${idx}]`).to.be.an(\"object\");",
+									"",
+									"    pm.expect(stop).to.have.property(\"id\");",
+									"    pm.expect(stop.id, `item[${idx}].id`).to.be.a(\"number\");",
+									"",
+									"    pm.expect(stop).to.have.property(\"driveId\");",
+									"    pm.expect(stop.driveId, `item[${idx}].driveId`).to.be.a(\"number\");",
+									"",
+									"    pm.expect(stop).to.have.property(\"residentId\");",
+									"    pm.expect(stop.residentId, `item[${idx}].residentId`).to.be.a(\"number\");",
+									"  });",
+									"});",
+									"",
+									"pm.test(\"IDs are unique if multiple stops exist\", function () {",
+									"  const ids = json.items.map(s => s.id);",
+									"  const unique = [...new Set(ids)];",
+									"  pm.expect(unique.length).to.eql(ids.length);",
+									"});",
+									"",
+									"pm.test(\"Save a stop ID for later requests\", function () {",
+									"  if (json.items.length > 0 && json.items[0].id !== undefined) {",
+									"    pm.environment.set(\"stop_id\", String(json.items[0].id));",
+									"  }",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"drive_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/driver/requested-stops",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"driver",
+								"requested-stops"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Requested Stops",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"drive_id\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/driver/requested-stops",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"driver",
+										"requested-stops"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:38:56 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "18"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"items\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "View Drives",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"    pm.expect(() => JSON.parse(pm.response.text())).not.throw();\r",
+									"});\r",
+									"\r",
+									"pm.test(\"'items' exists and is an array\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"items\");\r",
+									"    pm.expect(json.items).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each drive has required fields\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"\r",
+									"    json.items.forEach(drive => {\r",
+									"        pm.expect(drive).to.have.property(\"id\");\r",
+									"        pm.expect(drive).to.have.property(\"driverId\");\r",
+									"        pm.expect(drive).to.have.property(\"areaId\");\r",
+									"        pm.expect(drive).to.have.property(\"streetId\");\r",
+									"        pm.expect(drive).to.have.property(\"date\");\r",
+									"        pm.expect(drive).to.have.property(\"time\");\r",
+									"        pm.expect(drive).to.have.property(\"status\");\r",
+									"\r",
+									"        pm.expect([\"Upcoming\", \"In Progress\"]).to.include(drive.status);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Schema is correct\", function () {\r",
+									"    pm.response.to.have.jsonSchema({\r",
+									"        type: \"object\",\r",
+									"        required: [\"items\"],\r",
+									"        properties: {\r",
+									"            items: {\r",
+									"                type: \"array\",\r",
+									"                items: {\r",
+									"                    type: \"object\",\r",
+									"                    required: [\r",
+									"                        \"id\",\r",
+									"                        \"driverId\",\r",
+									"                        \"areaId\",\r",
+									"                        \"streetId\",\r",
+									"                        \"date\",\r",
+									"                        \"time\",\r",
+									"                        \"status\"\r",
+									"                    ],\r",
+									"                    properties: {\r",
+									"                        id: { type: \"number\" },\r",
+									"                        driverId: { type: \"number\" },\r",
+									"                        areaId: { type: \"number\" },\r",
+									"                        streetId: { type: \"number\" },\r",
+									"                        date: { type: \"string\" },\r",
+									"                        time: { type: \"string\" },\r",
+									"                        status: { \r",
+									"                            type: \"string\",\r",
+									"                            enum: [\"Upcoming\", \"In Progress\"]\r",
+									"                        }\r",
+									"                    }\r",
+									"                }\r",
+									"            }\r",
+									"        }\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No completed or cancelled drives returned\", function () {\r",
+									"    const drives = pm.response.json().items;\r",
+									"    drives.forEach(drive => {\r",
+									"        pm.expect(drive.status).to.not.be.oneOf([\"Completed\", \"Cancelled\"]);\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/driver/drives",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"driver",
+								"drives"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "View Drives",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/driver/drives",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"driver",
+										"drives"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:39:35 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "190"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"items\": [\n        {\n            \"areaId\": 1,\n            \"date\": \"2025-12-21\",\n            \"driverId\": 2,\n            \"id\": 2,\n            \"status\": \"Upcoming\",\n            \"streetId\": 1,\n            \"time\": \"12:11:00\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Drive",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 201\", function () {\r",
+									"  pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+									"});\r",
+									"\r",
+									"const json = pm.response.json();\r",
+									"\r",
+									"// Top-level response validation\r",
+									"pm.test(\"Response is an object\", function () {\r",
+									"  pm.expect(json).to.be.an(\"object\");\r",
+									"});\r",
+									"\r",
+									"// Required fields for a created drive\r",
+									"const requiredFields = [\"id\", \"driverId\", \"areaId\", \"streetId\", \"date\", \"time\", \"status\"];\r",
+									"\r",
+									"pm.test(\"Response contains required drive fields\", function () {\r",
+									"  requiredFields.forEach(field => {\r",
+									"    pm.expect(json, `Missing field: ${field}`).to.have.property(field);\r",
+									"  });\r",
+									"});\r",
+									"\r",
+									"// Validate field types\r",
+									"pm.test(\"Field types are correct\", function () {\r",
+									"  pm.expect(json.id).to.be.a(\"number\");\r",
+									"  pm.expect(json.areaId).to.be.a(\"number\");\r",
+									"  pm.expect(json.streetId).to.be.a(\"number\");\r",
+									"  pm.expect(json.status).to.be.a(\"string\");\r",
+									"\r",
+									"  pm.expect(new Date(json.date).toString() !== \"Invalid Date\").to.be.true;\r",
+									"  pm.expect(json.time).to.be.a(\"string\");\r",
+									"});\r",
+									"\r",
+									"// Check \"Upcoming\" status\r",
+									"pm.test(\"Status is 'Upcoming'\", function () {\r",
+									"  pm.expect(json.status).to.equal(\"Upcoming\");\r",
+									"});\r",
+									"\r",
+									"// Save drive_id for future tests\r",
+									"pm.test(\"Store drive_id\", function () {\r",
+									"  pm.environment.set(\"drive_id\", json.id);\r",
+									"});\r",
+									"\r",
+									"// Extra: ensure no scheduling in the past\r",
+									"pm.test(\"Drive date is not in the past\", function () {\r",
+									"  const today = new Date();\r",
+									"  const driveDate = new Date(json.date);\r",
+									"  pm.expect(driveDate >= today.setHours(0,0,0,0)).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"area_id\": 1, \r\n  \"street_id\": 1,\r\n  \"date\": \"2025-12-21\",\r\n  \"time\": \"12:11\" \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/driver/schedule-drive",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"driver",
+								"schedule-drive"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Drive",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"area_id\": 1, \r\n  \"street_id\": 1,\r\n  \"date\": \"2025-12-21\",\r\n  \"time\": \"12:11\" \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/driver/schedule-drive",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"driver",
+										"schedule-drive"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:39:25 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "133"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"areaId\": 1,\n    \"date\": \"2025-12-21\",\n    \"driverId\": 2,\n    \"id\": 2,\n    \"status\": \"Upcoming\",\n    \"streetId\": 1,\n    \"time\": \"12:11:00\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Start Drive",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+									"});\r",
+									"\r",
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Correct response shape\", function () {\r",
+									"  pm.expect(json).to.be.an(\"object\");\r",
+									"  pm.expect(json).to.have.property(\"id\");\r",
+									"  pm.expect(json).to.have.property(\"status\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Drive ID matches request\", function () {\r",
+									"  pm.expect(json.id).to.eql(Number(pm.environment.get(\"drive_id\")));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status must be 'started'\", function () {\r",
+									"  pm.expect(json.status).to.eql(\"started\");\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"drive_started_id\", json.id);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/driver/drives/{{drive_id}}/start",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"driver",
+								"drives",
+								"{{drive_id}}",
+								"start"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Start Drive",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/driver/drives/{{drive_id}}/start",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"driver",
+										"drives",
+										"{{drive_id}}",
+										"start"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:39:54 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "37"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 2,\n    \"status\": \"started\"\n}"
+						}
+					]
+				},
+				{
+					"name": "End Drive",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is valid JSON\", function () {\r",
+									"  pm.expect(() => pm.response.json()).to.not.throw();\r",
+									"});\r",
+									"\r",
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Correct response shape\", function () {\r",
+									"  pm.expect(json).to.have.property(\"id\");\r",
+									"  pm.expect(json).to.have.property(\"status\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status must be 'ended'\", function () {\r",
+									"  pm.expect(json.status).to.eql(\"ended\");\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"drive_ended_id\", json.id);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/driver/drives/end",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"driver",
+								"drives",
+								"end"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "End Drive",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/driver/drives/end",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"driver",
+										"drives",
+										"end"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:40:06 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "35"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 2,\n    \"status\": \"ended\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Cancel Drive",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is valid JSON\", function () {",
+									"    pm.expect(() => pm.response.json()).to.not.throw();",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"pm.test(\"Response contains id and status\", function () {",
+									"    pm.expect(json).to.be.an(\"object\");",
+									"    pm.expect(json).to.have.property(\"id\");",
+									"    pm.expect(json).to.have.property(\"status\");",
+									"});",
+									"",
+									"pm.test(\"Drive status is cancelled\", function () {",
+									"    pm.expect(json.status).to.eql(\"cancelled\");",
+									"});",
+									"",
+									"if (json.id) {",
+									"    pm.environment.set(\"drive_id\", json.id);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/driver/drives/{{drive_id}}/cancel",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"driver",
+								"drives",
+								"{{drive_id}}",
+								"cancel"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Cancel Drive",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/driver/drives/{{drive_id}}/cancel",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"driver",
+										"drives",
+										"{{drive_id}}",
+										"cancel"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.1"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 03 Dec 2025 22:40:27 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "39"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 2,\n    \"status\": \"cancelled\"\n}"
+						}
 					]
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Login",
+			"name": "Logout",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
+							"// Test that logout returns 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test that response message is \"Logged Out!\"\r",
+							"pm.test(\"Message is Logged Out!\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"message\", \"Logged Out!\");\r",
+							"});\r",
+							"\r",
+							"// Optional: clear auth_token from environment\r",
+							"pm.environment.unset(\"auth_token\");\r",
 							""
 						],
 						"type": "text/javascript",
@@ -112,113 +3351,12 @@
 				}
 			],
 			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"admin3\",\r\n  \"password\": \"pass123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/login",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Sign Up",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"admin6\",\r\n  \"password\": \"pass125\",\r\n  \"role\": \"admin\",\r\n  \"area_id\": 2,\r\n  \"street_id\": 5,\r\n  \"house_number\": \"12B\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/api/signup",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"signup"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Drive",
-			"request": {
 				"auth": {
 					"type": "bearer",
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTM1ODI5NywianRpIjoiNjU0NWFkNWMtZTgwMy00NTZhLWI5M2YtZWEzYzQ1NmI3MmRmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjkiLCJuYmYiOjE3NjEzNTgyOTcsImV4cCI6MTc2MTM1OTE5Nywicm9sZSI6bnVsbH0.bVyWNXPqeIoykGrhoDUPMBO68emnEiZ1pn4SXwjKnvg",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"street_id\": 13,\r\n  \"date\": 13,\r\n  \"time\": 1300\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/driver/drives",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"driver",
-						"drives"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "View Inbox",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTM1NjI0NiwianRpIjoiYTg0NjA4YTUtZDU2OC00Mzg1LTk1YTQtMjZkNzFlOWQ0MzJlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjkiLCJuYmYiOjE3NjEzNTYyNDYsImV4cCI6MTc2MTM1NzE0Niwicm9sZSI6bnVsbH0.02qX_3DJSEN_QXRaxstJtJS2wdBkdFNIJZvvX8GNLZY",
+							"value": "{{auth_token}}",
 							"type": "string"
 						}
 					]
@@ -226,113 +3364,47 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/resident/inbox",
+					"raw": "{{host}}/api/logout",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						"resident",
-						"inbox"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Request Stop",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTM1NjI0NiwianRpIjoiYTg0NjA4YTUtZDU2OC00Mzg1LTk1YTQtMjZkNzFlOWQ0MzJlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjkiLCJuYmYiOjE3NjEzNTYyNDYsImV4cCI6MTc2MTM1NzE0Niwicm9sZSI6bnVsbH0.02qX_3DJSEN_QXRaxstJtJS2wdBkdFNIJZvvX8GNLZY",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "\r\n{\"drive_id\" : \"324\" }\r\n\r\n  \r\n\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{host}}/resident/stops",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"resident",
-						"stops"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "View Status",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTM1NjI0NiwianRpIjoiYTg0NjA4YTUtZDU2OC00Mzg1LTk1YTQtMjZkNzFlOWQ0MzJlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjkiLCJuYmYiOjE3NjEzNTYyNDYsImV4cCI6MTc2MTM1NzE0Niwicm9sZSI6bnVsbH0.02qX_3DJSEN_QXRaxstJtJS2wdBkdFNIJZvvX8GNLZY",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/resident/driver-stats?street_id=13&from=Sangre Grande&to=Tunapuna",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"resident",
-						"driver-stats"
-					],
-					"query": [
-						{
-							"key": "street_id",
-							"value": "13"
-						},
-						{
-							"key": "from",
-							"value": "Sangre Grande"
-						},
-						{
-							"key": "to",
-							"value": "Tunapuna"
-						}
+						"api",
+						"logout"
 					]
 				}
 			},
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "host",
-			"value": "",
-			"type": "default"
-		},
-		{
-			"key": "admin_token",
-			"value": "",
-			"type": "default"
-		},
-		{
-			"key": "hosts",
-			"value": "",
-			"type": "default"
+			"value": ""
 		}
 	]
 }
