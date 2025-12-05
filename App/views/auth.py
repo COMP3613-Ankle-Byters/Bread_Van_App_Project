@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies, se
 from.index import index_views
 
 from App.controllers import (
+    initialize,
     login,
     create_user,
 )
@@ -64,3 +65,7 @@ def signup_api():
             return jsonify(out), 201
     except Exception as e:
         return jsonify({'Error': 'user cannot be created'}), 400
+
+@auth_views.route('/init', methods=['POST'])
+def init():
+    initialize()
