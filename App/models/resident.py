@@ -1,12 +1,5 @@
-from datetime import datetime
-from App.models.driver_stock import DriverStock
-from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy import JSON
-
 from App.database import db
 from .user import User
-from .driver import Driver
-from .stop import Stop
 from .notification import Notification
 
 MAX_INBOX_SIZE = 20
@@ -45,53 +38,11 @@ class Resident(User):
         user_json['inbox'] = self.inbox
         return user_json
 
-    def request_stop(self, driveId):
-        try:
-            new_stop = Stop(driveId=driveId, residentId=self.id)
-            db.session.add(new_stop)
-            db.session.commit()
-            return (new_stop)
-        except Exception:
-            db.session.rollback()
-            return None
-
-    def cancel_stop(self, stopId):
-        stop = Stop.query.get(stopId)
-        if stop:
-            db.session.delete(stop)
-            db.session.commit()
-        return
-
-    def receive_notif(self, message, driverId):
-        notif = Notification( resident_id=self.id, message=message, driver_id=driverId)
+    def update(self, message: str, driverID=None) -> None:
+        """Observer pattern update method - receives notifications from drivers."""
+        notif = Notification(resident_id=self.id, message=message, driver_id=driverID)
         if len(self.inbox) >= MAX_INBOX_SIZE:
             oldest_notif = min(self.inbox, key=lambda n: n.date)
             db.session.delete(oldest_notif)
         db.session.add(notif)
         db.session.commit()
-
-
-    def view_inbox(self):
-        return [notif.get_json() for notif in self.inbox]
-
-    def view_driver_stats(self, driverId):
-        driver = Driver.query.get(driverId)
-        if not driver:
-            return None
-
-        stocks = DriverStock.query.filter_by(driverId=driverId).all()
-        stock_json = [s.get_json() for s in stocks]
-
-        driver_info = driver.get_json() if hasattr(driver, 'get_json') else {
-            "id": driver.id,
-            "username": driver.username,
-            "areaId": getattr(driver, "areaId", None),
-            "streetId": getattr(driver, "streetId", None)
-        }
-
-        driver_info["stock"] = stock_json
-
-        return driver_info
-
-    def update(self, message: str, driverID = None) -> None:
-        self.receive_notif(message, driverID)

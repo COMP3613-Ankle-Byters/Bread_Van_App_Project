@@ -6,10 +6,9 @@ from flask_migrate import Migrate, upgrade
 
 from App.database import db, get_migrate
 from App.database import db
-from App.models import User, Admin, Driver, Resident, Drive, Stop, Area, Street
+from App.models import User, Admin, Driver, Resident, Drive, Area, Street
 from App.main import create_app
-from App.controllers import (get_user, get_all_users_json, get_all_users,
-                             get_user_by_username, initialize)
+from App.controllers import (get_all_users, initialize)
 from App.controllers.admin import (
     admin_add_item,
     admin_create_driver,
@@ -44,18 +43,6 @@ from App.models.item import Item
 
 app = create_app()
 migrate = get_migrate(app)
-
-from App.api.admin import bp as admin_bp
-from App.api.common import bp as common_bp
-from App.api.driver import bp as driver_bp
-from App.api.resident import bp as resident_bp
-from App.api.auth import bp as auth_bp
-
-app.register_blueprint(admin_bp)
-app.register_blueprint(common_bp)
-app.register_blueprint(driver_bp)
-app.register_blueprint(resident_bp)
-app.register_blueprint(auth_bp)
 
 with app.app_context():
     upgrade()
@@ -243,7 +230,7 @@ def delete_item_command(item_id):
         return
     try:
         item = admin_delete_item(item_id)
-        print(f"Item {item} deleted.")
+        print(f"Item {item.name} deleted.")
     except ValueError as e:
         print(str(e))
         
@@ -391,12 +378,12 @@ def end_drive_command():
         print(str(e))
 
 @driver_cli.command("view_requested_stops", help="View requested stops for a drive")
-@click.argument("drive_id")
-def view_requested_stops_command(drive_id):
+@click.argument("driveId")
+def view_requested_stops_command(driveId):
     driver = require_driver()
     if not driver:
         return
-    stops = driver_view_requested_stops(driver, drive_id)
+    stops = driver_view_requested_stops(driver, driveId)
     if not stops:
         print("No requested stops for this drive.")
         return
@@ -518,12 +505,15 @@ def view_driver_stats_command(driver_id):
         return
     try:
         driver = resident_view_driver_stats(resident, driver_id)
-        print(f"\nDriver {driver['username']} (ID: {driver['id']}) Stats:")
-        print(f"Area ID: {driver.get('areaId', 'N/A')}")
-        print(f"Street ID: {driver.get('streetId', 'N/A')}")
-        print("Stock:")
-        for stock in driver['stock']:
-            print(f" - Item ID: {stock['itemId']}, Quantity: {stock['quantity']}")
+        if driver.status == "Offline":
+            print(f"Driver {driver.username} is currently offline.")
+        elif driver.status == "Available":
+            area = Area.query.get(driver.areaId)
+            print(f"Driver {driver.username} is currently available at {area.name}")
+        elif driver.status == "Busy":
+            area = Area.query.get(driver.areaId)
+            street = Street.query.get(driver.streetId)
+            print(f"Driver {driver.username} is currently on a drive at {street.name}, {area.name}")
     except ValueError as e:
         print(str(e))
 
@@ -583,7 +573,7 @@ test = AppGroup('test', help='Testing commands')
 @click.argument("type", default="all")
 def user_tests_command(type):
     if type == "unit":
-        sys.exit(pytest.main(["-k", "UnitTests"]))
+        sys.exit(pytest.main(["-k", "UserUnitTests"]))
     elif type == "int":
         sys.exit(pytest.main(["-k", "IntegrationTests"]))
     else:
