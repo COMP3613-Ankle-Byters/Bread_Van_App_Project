@@ -1,7 +1,9 @@
 import os, tempfile, pytest, logging, unittest
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import date, time
+from datetime import date, datetime, time, timedelta
 
+from App.controllers.admin import admin_add_area, admin_add_street, admin_delete_area, admin_delete_street, admin_view_all_areas, admin_view_all_streets
+from App.controllers.notification import create_notification, get_notifications
 from App.main import create_app
 from App.database import db, create_db
 from App.models import User, Resident, Driver, Admin, Area, Street, Drive, Stop, Item, DriverStock
@@ -58,34 +60,19 @@ class ResidentUnitTests(unittest.TestCase):
 
     def test_receive_notif(self):
         resident = Resident("john", "johnpass", 1, 2, 123)
-        driver = Driver("driv", "driverpass", "Busy", 2, 12)
-        db.session.add(resident)
-        db.session.add(driver)
-        db.session.commit()
-
-        resident.receive_notif("New msg", driver.id)
-
-        notif = resident.inbox[-1]
-
-        assert notif.message == "New msg"
-        assert notif.driver_id == driver.id
-        assert notif.resident_id == resident.id
+        resident.receive_notif("New msg")
+        assert resident.inbox[-1].endswith("New msg")
+        assert resident.inbox[-1].startswith("[")
 
     def test_view_inbox(self):
         resident = Resident("john", "johnpass", 1, 2, 123)
-        driver = Driver("sourname", "driverpass", "Busy", 2, 12)
-        db.session.add(resident)
-        db.session.add(driver)
-        db.session.commit()
-
-        resident.receive_notif("msg1", driver.id)
-        resident.receive_notif("msg2", driver.id)
-
+        resident.receive_notif("msg1")
+        resident.receive_notif("msg2")
         assert len(resident.inbox) == 2
-
-        assert resident.inbox[0].message == "msg1"
-        assert resident.inbox[1].message == "msg2"
-
+        assert resident.inbox[0].endswith("msg1")
+        assert resident.inbox[1].endswith("msg2")
+        assert resident.inbox[0].startswith("[")
+        assert resident.inbox[1].startswith("[")
         
 class DriverUnitTests(unittest.TestCase):
 
@@ -191,30 +178,14 @@ class DriverStockUnitTests(unittest.TestCase):
 
     def test_new_driverStock(self):
         driverStock = DriverStock(1, 2, 30)
-        self.assertDictEqual(
-            {
-                "stockId" : None,
-                "driverId" : 1,
-                "itemId" : 2,
-                "itemName" : None,
-                "quantity" : 30
-            },
-            driverStock.get_json()
-        )
+        assert driverStock.driverId == 1
+        assert driverStock.itemId == 2
+        assert driverStock.quantity == 30
 
     def test_driverStock_getJSON(self):
         driverStock = DriverStock(1, 2, 30)
         driverStock_json = driverStock.get_json()
-        self.assertDictEqual(
-            {
-                "stockId" : None,
-                "driverId" : 1,
-                "itemId" : 2,
-                "itemName" : None,
-                "quantity" : 30
-            },
-            driverStock.get_json()
-        )
+        self.assertDictEqual(driverStock_json, {"id":None, "driverId":1, "itemId":2, "quantity":30})
         
 
 '''
@@ -268,18 +239,14 @@ class UsersIntegrationTests(unittest.TestCase):
 class ResidentsIntegrationTests(unittest.TestCase):
     
     def setUp(self):
-        self.area = Area("St. Augustine")
-        db.session.add(self.area)
-        db.session.commit()
-        self.street = Street(self.area.id, "Warner Street")
-        db.session.add(self.street)
-        db.session.commit()
-        self.driver = admin_create_driver("driver1", "pass")
-        self.resident = resident_create("john", "johnpass", self.area.id, self.street.id, 123)
-        self.drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2025-12-10", "11:30")
+        self.driver = admin_create_driver("taxiDriver", "pass")
+        self.area = admin_add_area("St. Augustine")
+        self.street = admin_add_street(self.area.id, "Warner Street")
+        self.resident = resident_create("house", "housepass", self.area.id, self.street.id, 123)
+        self.drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2026-1-28", "10:00")
         self.item = admin_add_item("Whole-Grain Bread", 19.50, "Healthy whole-grain loaf", ["whole-grain", "healthy"])
-
-
+        
+        
     def test_request_stop(self):
         stop = resident_request_stop(self.resident, self.drive.id)
         self.assertIsNotNone(stop)
@@ -298,26 +265,24 @@ class ResidentsIntegrationTests(unittest.TestCase):
         stock = resident_view_stock(self.resident, self.driver.id)
         self.assertIsNotNone(stock)
 
+
 class DriversIntegrationTests(unittest.TestCase):
                 
     def setUp(self):
-        self.area = Area("St. Augustine")
-        db.session.add(self.area)
-        db.session.commit()
-        self.street = Street(self.area.id, "Warner Street")
-        db.session.add(self.street)
-        db.session.commit()
-        self.driver = admin_create_driver("driver1", "pass")
-        self.resident = resident_create("john", "johnpass", self.area.id, self.street.id, 123)
-        self.drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2025-12-10", "11:30")
+        self.area = admin_add_area("Port-of-Spain")
+        self.street = admin_add_street(self.area.id, "King Street")
+        self.driver = admin_create_driver("taxiDriver", "pass")
+        self.resident = resident_create("house", "housepass", self.area.id, self.street.id, 123)
+        self.drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2026-1-28", "11:30")
+        self.stop = resident_request_stop(self.resident, self.drive.id)
         self.item = admin_add_item("Whole-Grain Bread", 19.50, "Healthy whole-grain loaf", ["whole-grain", "healthy"])
 
     def test_schedule_drive(self):
-        drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2025-12-30", "09:00")
+        drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2026-1-27", "09:00")
         self.assertIsNotNone(drive)
 
     def test_cancel_drive(self):
-        drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2025-12-13", "08:15")
+        drive = driver_schedule_drive(self.driver, self.area.id, self.street.id, "2026-1-27", "08:15")
         driver_cancel_drive(self.driver, drive.id)
         assert drive.status == "Cancelled"
 
@@ -364,6 +329,43 @@ class AdminsIntegrationTests(unittest.TestCase):
         admin_delete_driver(driver.id)
         assert Driver.query.filter_by(id=driver.id).first() == None
 
+    def test_add_area(self):
+        area = admin_add_area("San Fernando")
+        assert Area.query.filter_by(id=area.id).first() != None
+
+    def test_delete_area(self):
+        area = admin_add_area("San Fernando")
+        admin_delete_area(area.id)
+        assert Area.query.filter_by(id=area.id).first() == None
+
+    def test_view_all_areas(self):
+        admin_add_area("Hokaido")
+        admin_add_area("Tokyo")
+        admin_add_area("Osaka")
+        areas = admin_view_all_areas()
+        assert areas != None
+        assert len(areas) == 3
+
+    def test_add_street(self):
+        area = admin_add_area("Port-of-Spain")
+        street = admin_add_street(area.id, "Fredrick Street")
+        assert Street.query.filter_by(id=street.id).first() != None
+
+    def test_delete_street(self):
+        area = admin_add_area("Port-of-Spain")
+        street = admin_add_street(area.id, "Fredrick Street")
+        admin_delete_street(street.id)
+        assert Street.query.filter_by(id=street.id).first() == None
+
+    def test_view_all_streets(self):
+        area = admin_add_area("Port-of-Spain")
+        admin_add_street(area.id, "Fredrick Street")
+        admin_add_street(area.id, "Warner Street")
+        admin_add_street(area.id, "St. Vincent Street")
+        streets = admin_view_all_streets()
+        assert streets != None
+        assert len(streets) == 3
+
     def test_add_item(self):
         item = admin_add_item("Whole-Grain Bread", 19.50, "Healthy whole-grain loaf", ["whole-grain", "healthy"])
         assert Item.query.filter_by(id=item.id).first() != None
@@ -381,5 +383,26 @@ class AdminsIntegrationTests(unittest.TestCase):
         assert items != None
         assert len(items) == 3
         
+class NotificationsIntegrationTests(unittest.TestCase):
+    def setUp(self):
+        self.area = admin_add_area("St. Augustine")
+        self.street = admin_add_street(self.area.id, "Warner Street")
+        self.resident = resident_create("house", "housepass", self.area.id, self.street.id, 123)
+    def test_create_notification(self):
+        notification = create_notification(self.resident.id, "Your drive is scheduled for tomorrow.")
+        self.assertIsNotNone(notification)
+        self.assertEqual(notification.resident_id, self.resident.id)
+        self.assertEqual(notification.message, "Your drive is scheduled for tomorrow.")
 
+    def test_get_notifications(self):
+        create_notification(self.resident.id, "Your drive is scheduled for tomorrow.")
+        create_notification(self.resident.id, "Your stop has been approved.")
+        notifications = get_notifications(self.resident.id)
+        
+        assert len(notifications) == 2
+        messages = {n.message for n in notifications}
+        assert messages == {
+            "Your drive is scheduled for tomorrow.",
+            "Your stop has been approved."
+        }
 
