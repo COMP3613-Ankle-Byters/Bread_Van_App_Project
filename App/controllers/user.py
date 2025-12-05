@@ -1,4 +1,4 @@
-from App.models import User, Driver
+from App.models import User, Driver, Drive
 from App.database import db
 
 def create_user(username, password):
@@ -28,7 +28,6 @@ def update_user(id, username):
     user = get_user(id)
     if user:
         user.username = username
-        # user is already in the session; no need to re-add
         db.session.commit()
         return True
     return None
@@ -51,4 +50,4 @@ def user_logout(user):
     return user
 
 def user_view_street_drives(user, area_id, street_id):
-    return user.view_street_drives(area_id, street_id)
+    return Drive.query.filter_by(areaId=area_id, streetId=street_id).all()

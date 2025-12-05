@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, request, flash, send_from_directory, flash, redirect, url_for
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies, set_access_cookies
 
 
@@ -10,7 +10,7 @@ from App.controllers import (
 )
 from App.controllers import resident as resident_controller
 
-auth_views = Blueprint('auth_views', __name__, template_folder='../templates')
+auth_views = Blueprint('auth_views', __name__)
 
 
 @auth_views.route('/api/login', methods=['POST'])
